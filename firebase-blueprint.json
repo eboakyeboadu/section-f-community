@@ -1,0 +1,392 @@
+{
+  "entities": {
+    "Profile": {
+      "title": "Profile",
+      "description": "A Section F classmate's directory profile card and information",
+      "type": "object",
+      "properties": {
+        "uid": {
+          "type": "string",
+          "description": "Firebase Auth UID of the classmate",
+          "maxLength": 128
+        },
+        "fullName": {
+          "type": "string",
+          "description": "Full legal or preferred name",
+          "maxLength": 100
+        },
+        "nickname": {
+          "type": "string",
+          "description": "Preferred nickname or short name",
+          "maxLength": 60
+        },
+        "pronunciation": {
+          "type": "string",
+          "description": "Name pronunciation phonetic guide",
+          "maxLength": 100
+        },
+        "email": {
+          "type": "string",
+          "description": "Personal or Harvard email address",
+          "maxLength": 120
+        },
+        "whatsapp": {
+          "type": "string",
+          "description": "WhatsApp number with country code",
+          "maxLength": 30
+        },
+        "birthday": {
+          "type": "string",
+          "description": "Classmate birthday in MM/DD format",
+          "maxLength": 10
+        },
+        "photoUrl": {
+          "type": "string",
+          "description": "Cloud Storage or profile photo URL",
+          "maxLength": 1000
+        },
+        "homeCountry": {
+          "type": "string",
+          "description": "Home or origin country",
+          "maxLength": 60
+        },
+        "countryCode": {
+          "type": "string",
+          "description": "ISO 2-letter country code for flag display",
+          "maxLength": 4
+        },
+        "hometown": {
+          "type": "string",
+          "description": "Hometown city and state/region",
+          "maxLength": 80
+        },
+        "housingType": {
+          "type": "string",
+          "description": "Campus housing type: dorm, sfp, owa, or off_campus",
+          "enum": ["dorm", "sfp", "owa", "off_campus"],
+          "maxLength": 30
+        },
+        "housingDetail": {
+          "type": "string",
+          "description": "Specific dorm hall / apartment / address",
+          "maxLength": 100
+        },
+        "preHbsCompany": {
+          "type": "string",
+          "description": "Pre-HBS company or employer",
+          "maxLength": 80
+        },
+        "preHbsRole": {
+          "type": "string",
+          "description": "Pre-HBS role or title",
+          "maxLength": 80
+        },
+        "preHbsIndustry": {
+          "type": "string",
+          "description": "Pre-HBS industry sector",
+          "maxLength": 50
+        },
+        "companyUrl": {
+          "type": "string",
+          "description": "External company website URL",
+          "maxLength": 200
+        },
+        "undergradSchool": {
+          "type": "string",
+          "description": "Undergraduate alma mater",
+          "maxLength": 100
+        },
+        "postHbsExploration": {
+          "type": "array",
+          "description": "Target industries or goals explored post-HBS"
+        },
+        "languages": {
+          "type": "array",
+          "description": "Languages spoken"
+        },
+        "countriesLived": {
+          "type": "string",
+          "description": "Countries lived in and years",
+          "maxLength": 200
+        },
+        "funFact": {
+          "type": "string",
+          "description": "Section F fun fact or memorable icebreaker",
+          "maxLength": 500
+        },
+        "hobbies": {
+          "type": "string",
+          "description": "Hobbies, sports, and weekend passions",
+          "maxLength": 300
+        },
+        "venmoHandle": {
+          "type": "string",
+          "description": "Venmo handle for class social splits",
+          "maxLength": 50
+        },
+        "zelleInfo": {
+          "type": "string",
+          "description": "Zelle phone or email",
+          "maxLength": 100
+        },
+        "hasPartner": {
+          "type": "boolean",
+          "description": "Whether classmate has a partner/spouse"
+        },
+        "partnerName": {
+          "type": "string",
+          "description": "Partner full name",
+          "maxLength": 80
+        },
+        "partnerAffiliation": {
+          "type": "string",
+          "description": "Partner Harvard affiliation / occupation",
+          "maxLength": 100
+        },
+        "partnerContact": {
+          "type": "string",
+          "description": "Partner contact or Instagram handle",
+          "maxLength": 80
+        },
+        "partnerPhotoUrl": {
+          "type": "string",
+          "description": "Partner photo URL",
+          "maxLength": 1000
+        },
+        "privacyLevel": {
+          "type": "string",
+          "description": "Privacy tier: share_all or hide_contact_address",
+          "enum": ["share_all", "hide_contact_address"],
+          "maxLength": 30
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Creation timestamp",
+          "maxLength": 40
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Last updated timestamp",
+          "maxLength": 40
+        }
+      },
+      "required": ["uid", "fullName", "email", "homeCountry", "preHbsCompany"]
+    },
+    "UnclaimedCard": {
+      "title": "UnclaimedCard",
+      "description": "Pre-populated Section F member card awaiting user claim upon sign-in",
+      "type": "object",
+      "properties": {
+        "fullName": {
+          "type": "string",
+          "description": "Full name from PDF/Google Form",
+          "maxLength": 100
+        },
+        "nickname": {
+          "type": "string",
+          "description": "Nickname or short name",
+          "maxLength": 60
+        },
+        "pronunciation": {
+          "type": "string",
+          "description": "Phonetic pronunciation",
+          "maxLength": 100
+        },
+        "hometown": {
+          "type": "string",
+          "description": "Hometown city and state/country",
+          "maxLength": 100
+        },
+        "homeCountry": {
+          "type": "string",
+          "description": "Home Country",
+          "maxLength": 80
+        },
+        "housing": {
+          "type": "string",
+          "description": "Campus housing or address",
+          "maxLength": 120
+        },
+        "preHbsCompany": {
+          "type": "string",
+          "description": "Company prior to HBS",
+          "maxLength": 100
+        },
+        "preHbsRole": {
+          "type": "string",
+          "description": "Pre-HBS job title",
+          "maxLength": 100
+        },
+        "companyUrl": {
+          "type": "string",
+          "description": "Company URL",
+          "maxLength": 200
+        },
+        "exploringInterests": {
+          "type": "array",
+          "description": "Career interests being explored"
+        },
+        "hobbies": {
+          "type": "string",
+          "description": "Hobbies and pastimes",
+          "maxLength": 400
+        },
+        "funFact": {
+          "type": "string",
+          "description": "Fun fact / Icebreaker",
+          "maxLength": 600
+        },
+        "venmo": {
+          "type": "string",
+          "description": "Venmo handle",
+          "maxLength": 60
+        },
+        "zelle": {
+          "type": "string",
+          "description": "Zelle contact info",
+          "maxLength": 100
+        },
+        "claimed": {
+          "type": "boolean",
+          "description": "Whether this card has been claimed by a user"
+        },
+        "claimedByUid": {
+          "type": "string",
+          "description": "Auth UID of the user who claimed this card",
+          "maxLength": 128
+        }
+      },
+      "required": ["fullName", "claimed"]
+    },
+    "CohortEvent": {
+      "title": "CohortEvent",
+      "description": "Shared Section F cohort events, gatherings, Partiful socials, and study sessions",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique event identifier",
+          "maxLength": 128
+        },
+        "title": {
+          "type": "string",
+          "description": "Event headline or title",
+          "maxLength": 150
+        },
+        "description": {
+          "type": "string",
+          "description": "Event details or notes",
+          "maxLength": 1000
+        },
+        "date": {
+          "type": "string",
+          "description": "Event date in YYYY-MM-DD format",
+          "maxLength": 20
+        },
+        "time": {
+          "type": "string",
+          "description": "Event time string e.g. 7:30 PM",
+          "maxLength": 30
+        },
+        "location": {
+          "type": "string",
+          "description": "Location or venue",
+          "maxLength": 200
+        },
+        "type": {
+          "type": "string",
+          "description": "Category: social, academic, sports, other",
+          "maxLength": 30
+        },
+        "partifulUrl": {
+          "type": "string",
+          "description": "Direct Partiful RSVP or group URL",
+          "maxLength": 500
+        },
+        "createdByUid": {
+          "type": "string",
+          "description": "Auth UID of the classmate who posted the event",
+          "maxLength": 128
+        },
+        "createdByName": {
+          "type": "string",
+          "description": "Display name of the event organizer",
+          "maxLength": 100
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Creation timestamp",
+          "maxLength": 40
+        }
+      },
+      "required": ["id", "title", "date", "type"]
+    },
+    "CoffeeChatInvitation": {
+      "title": "CoffeeChatInvitation",
+      "description": "In-app and email coffee chat invitation between classmates",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "senderUid": { "type": "string" },
+        "senderName": { "type": "string" },
+        "senderEmail": { "type": "string" },
+        "senderPhone": { "type": "string" },
+        "senderPhoto": { "type": "string" },
+        "recipientUid": { "type": "string" },
+        "recipientName": { "type": "string" },
+        "recipientEmail": { "type": "string" },
+        "proposedDate": { "type": "string" },
+        "proposedTime": { "type": "string" },
+        "location": { "type": "string" },
+        "templateType": { "type": "string" },
+        "message": { "type": "string" },
+        "status": { "type": "string", "enum": ["pending", "accepted", "declined", "completed"] },
+        "read": { "type": "boolean" },
+        "createdAt": { "type": "string" },
+        "updatedAt": { "type": "string" }
+      },
+      "required": ["id", "senderUid", "recipientUid", "status", "createdAt"]
+    },
+    "ChatMessage": {
+      "title": "ChatMessage",
+      "description": "Direct in-app messages between Section F classmates",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "maxLength": 128 },
+        "conversationId": { "type": "string", "maxLength": 260 },
+        "senderUid": { "type": "string", "maxLength": 128 },
+        "senderName": { "type": "string", "maxLength": 100 },
+        "senderPhoto": { "type": "string", "maxLength": 1000 },
+        "recipientUid": { "type": "string", "maxLength": 128 },
+        "recipientName": { "type": "string", "maxLength": 100 },
+        "message": { "type": "string", "maxLength": 3000 },
+        "read": { "type": "boolean" },
+        "createdAt": { "type": "string", "maxLength": 40 }
+      },
+      "required": ["id", "conversationId", "senderUid", "recipientUid", "message", "read", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/profiles/{uid}": {
+      "schema": "Profile",
+      "description": "Classmate profile document accessible to authenticated Section F members"
+    },
+    "/unclaimed_cards/{cardId}": {
+      "schema": "UnclaimedCard",
+      "description": "Unclaimed roster cards seeded from Section F Google Form / PDF directory"
+    },
+    "/cohort_events/{eventId}": {
+      "schema": "CohortEvent",
+      "description": "Shared Section F cohort events, Partiful gatherings, and study sessions"
+    },
+    "/coffee_chat_invitations/{inviteId}": {
+      "schema": "CoffeeChatInvitation",
+      "description": "In-app coffee chat invitations sent to classmates"
+    },
+    "/chat_messages/{messageId}": {
+      "schema": "ChatMessage",
+      "description": "In-app direct messages exchanged between Section F classmates"
+    }
+  }
+}
+

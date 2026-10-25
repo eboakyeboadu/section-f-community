@@ -1,0 +1,169 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    // App admin (mirrors ADMIN_EMAILS in src/App.tsx and server.ts)
+    function isAdmin() {
+      return isSignedIn() &&
+        request.auth.token.email == 'admin@example.com' &&
+        request.auth.token.email_verified == true;
+    }
+
+    // Connection test document
+    match /test/connection {
+      allow read: if true;
+    }
+
+    // Unclaimed Cards collection
+    // Read: anyone can read to allow name searching during onboarding
+    // Create/delete: admin only (roster seeding)
+    // Update: admin re-seeding, or a signed-in user claiming an unclaimed card for themselves
+    //         (claim writes exactly claimed/claimedByUid/claimedAt with their own uid)
+    match /unclaimed_cards/{cardId} {
+      allow read: if true;
+      allow create, delete: if isAdmin();
+      allow update: if isAdmin() || (
+        isSignedIn() &&
+        request.auth.token.email is string &&
+        request.auth.token.email_verified == true &&
+        resource != null &&
+        resource.data.claimed == false &&
+        resource.data.email is string &&
+        resource.data.email.lower() == request.auth.token.email.lower() &&
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['claimed', 'claimedByUid', 'claimedAt']) &&
+        request.resource.data.claimed == true &&
+        request.resource.data.claimedByUid == request.auth.uid
+      );
+    }
+
+    // Classmate Profiles - readable by directory users, editable only by profile owner
+    match /profiles/{uid} {
+      allow read: if true;
+      allow create: if isSignedIn() && isValidId(uid) && uid == request.auth.uid;
+      allow update: if (isOwner(uid) && isValidId(uid)) ||
+                      (isSignedIn() && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['welcomeEmailSentAt', 'welcomeEmailRecipient', 'welcomeEmailMessageId', 'updatedAt']));
+      allow delete: if isOwner(uid);
+
+      // Private personal coffee chat notes & tracker records - strictly accessible only by profile owner
+      match /coffee_chats/{classmateUid} {
+        allow read, write: if isOwner(uid);
+      }
+
+      // Private per-classmate assistant data (connected-account assistant)
+      // Every document under a user's namespace is strictly owner-only.
+      match /assistant/{document=**} {
+        allow read, write: if isOwner(uid);
+      }
+    }
+
+    // Authorized Cohort Members (Roster)
+    // Read: public on purpose - the pre-auth login check (isAuthorizedEmailInFirestore) queries it before sign-in
+    // Write: admin only (roster sync via AdminSeedModal). Classmates must not alter the roster.
+    match /authorized_members/{memberId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Section F Cohort Events (Partiful & shared gatherings)
+    // Read: anyone can view cohort events
+    // Write: create, update, delete for authenticated classmates or creator
+    match /cohort_events/{eventId} {
+      allow read: if true;
+      allow create: if isSignedIn() && isValidId(eventId);
+      allow update, delete: if isSignedIn() && (
+        resource.data.createdByUid == request.auth.uid ||
+        !('createdByUid' in resource.data) ||
+        resource.data.createdByUid == null
+      );
+    }
+
+    // Coffee Chat Invitations & Notifications
+    match /coffee_chat_invitations/{inviteId} {
+      allow read: if isSignedIn() && (
+        resource.data.recipientUid == request.auth.uid ||
+        resource.data.senderUid == request.auth.uid
+      );
+      allow create: if isSignedIn() && isValidId(inviteId) && request.resource.data.senderUid == request.auth.uid;
+      allow update, delete: if isSignedIn() && (
+        resource.data.recipientUid == request.auth.uid ||
+        resource.data.senderUid == request.auth.uid
+      );
+    }
+
+    // In-App Direct Chat Messages between classmates
+    match /chat_messages/{messageId} {
+      allow read: if isSignedIn() && (
+        resource.data.recipientUid == request.auth.uid ||
+        resource.data.senderUid == request.auth.uid
+      );
+      allow create: if isSignedIn() && isValidId(messageId) && request.resource.data.senderUid == request.auth.uid;
+      allow update: if isSignedIn() && (
+        resource.data.recipientUid == request.auth.uid ||
+        resource.data.senderUid == request.auth.uid
+      );
+      allow delete: if isSignedIn() && resource.data.senderUid == request.auth.uid;
+    }
+
+    // Web Push Subscriptions - owner can write and read device registration
+    match /push_subscriptions/{subId} {
+      allow read, write: if isSignedIn() && isValidId(subId);
+    }
+
+    // Photo Upload Reminder Tracking
+    match /photo_reminders/{reminderId} {
+      allow read, write: if isSignedIn() && isValidId(reminderId);
+    }
+
+    // Shared Coffee Chat Status (Synchronized between both counterparties in real-time)
+    match /shared_coffee_chats/{chatId} {
+      allow read: if isSignedIn() && (
+        resource.data.participants.hasAny([request.auth.uid])
+      );
+      allow create: if isSignedIn() && isValidId(chatId) && request.resource.data.participants.hasAny([request.auth.uid]);
+      allow update, delete: if isSignedIn() && resource.data.participants.hasAny([request.auth.uid]);
+    }
+
+    // Welcome Email & Registration Audit Tracking
+    // Document id is the member's uid. Owner writes their own audit record after their welcome email;
+    // admin writes member records when resending. Nobody else.
+    match /welcome_emails/{uid} {
+      allow read: if isOwner(uid) || isAdmin();
+      allow create, update: if isOwner(uid) || isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // Application Analytics & Interaction Telemetry
+    // Create stays open for pre-login telemetry (client-side trackEvent design);
+    // reading or changing analytics is admin-only.
+    match /analytics_events/{eventId} {
+      allow create: if request.resource.data.keys().hasOnly(['id', 'eventType', 'timestamp', 'metadata', 'sessionId']) &&
+        request.resource.data.id is string &&
+        request.resource.data.eventType is string &&
+        request.resource.data.eventType.size() <= 60 &&
+        request.resource.data.timestamp is string;
+      allow read, update, delete: if isAdmin();
+    }
+
+    // Aggregated app analytics counters - written by client telemetry from any session,
+    // readable only by admin.
+    match /app_analytics/{docId} {
+      allow read: if isAdmin();
+      allow create, update: if docId == 'summary' &&
+        request.resource.data.keys().hasOnly(['emailClicks', 'loginStarted', 'loginCompleted', 'loginFailed', 'loginAbandoned', 'guestModeEntered', 'guestModeConverted', 'coffeeChatsViewed', 'coffeeInvitesSent', 'atlasViewed', 'spotlightViewed', 'deckViewed', 'loginErrors', 'lastUpdated']) &&
+        request.resource.data.lastUpdated is string;
+      allow delete: if isAdmin();
+    }
+  }
+}
+

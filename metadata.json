@@ -1,0 +1,10 @@
+{
+  "name": "Section F Cards",
+  "description": "Mobile-first PWA for Section F cards, interactive infographics, Bumble-style networking deck, and daily spotlight.",
+  "requestFramePermissions": [
+    "MICROPHONE",
+    "CAMERA"
+  ],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
+
